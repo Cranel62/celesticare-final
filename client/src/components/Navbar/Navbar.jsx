@@ -5,16 +5,16 @@ import styles from './Navbar.module.css';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, isAuthenticated, logoutUser } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsOpen((prev) => !prev);
   const closeMenu = () => setIsOpen(false);
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     closeMenu();
-    await logoutUser();
-    navigate('/');
+    logout();
+    navigate('/login');
   };
 
   return (
