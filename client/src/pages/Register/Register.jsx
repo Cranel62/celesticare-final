@@ -49,67 +49,60 @@ export default function Register() {
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <div className={styles.loginCard}>
+    <div className={styles.loginPageWrapper}>
+      <div className={styles.loginBox}>
         <div className={styles.brandTitle}>CELESTICARE</div>
-        <div className={styles.subTitle}>Create your cosmic profile</div>
+        <div className={styles.loginHeading}>Create your cosmic profile</div>
 
         {errorMessage && (
-          <div className="alert alert-danger" style={{ 
-            backgroundColor: '#f8d7da', 
-            color: '#721c24', 
-            padding: '10px 15px', 
-            borderRadius: '10px', 
-            marginBottom: '15px',
-            fontSize: '0.9rem'
-          }}>
+          <div className={styles.alertDanger}>
             {errorMessage}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className={styles.inputGroup}>
+          <div>
             <input
               type="text"
               name="username"
               placeholder="Username"
-              className={styles.inputField}
+              className={styles.formControl}
               value={formData.username}
               onChange={handleChange}
               required
             />
           </div>
 
-          <div className={styles.inputGroup}>
+          <div>
             <input
               type="email"
               name="email"
               placeholder="Email"
-              className={styles.inputField}
+              className={styles.formControl}
               value={formData.email}
               onChange={handleChange}
               required
             />
           </div>
 
-          <div className={styles.inputGroup}>
+          <div>
             <input
               type="password"
               name="password"
               placeholder="Password"
-              className={styles.inputField}
+              className={styles.formControl}
               value={formData.password}
               onChange={handleChange}
               required
             />
           </div>
 
-          <div className={styles.inputGroup}>
+          <div>
             <input
               type="password"
               name="confirm_password"
               placeholder="Confirm Password"
-              className={styles.inputField}
+              className={styles.formControl}
               value={formData.confirm_password}
               onChange={handleChange}
               required
@@ -117,12 +110,12 @@ export default function Register() {
           </div>
 
           {isAdminDomain && (
-            <div className={styles.inputGroup}>
+            <div>
               <input
                 type="password"
                 name="admin_secret"
                 placeholder="Admin Secret Key"
-                className={styles.inputField}
+                className={styles.formControl}
                 value={formData.admin_secret}
                 onChange={handleChange}
                 required
@@ -130,13 +123,13 @@ export default function Register() {
             </div>
           )}
 
-          <button type="submit" className={styles.loginBtn} disabled={loading}>
+          <button type="submit" className={styles.btnLogin} disabled={loading}>
             {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
         </form>
 
-        <div className={styles.footerText}>
-          Already have a profile? <Link to="/login" className={styles.linkText}>Log in</Link>
+        <div className={styles.textMuted}>
+          Already have a profile? <Link to="/login">Log in</Link>
         </div>
       </div>
     </div>
