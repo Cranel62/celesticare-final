@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext();
 
@@ -9,7 +9,14 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserProfile = async () => {
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    sessionStorage.clear();
+    setToken(null);
+    setUser(null);
+  }, []);
+
+  const fetchUserProfile = useCallback(async () => {
     const activeToken = token || localStorage.getItem('token');
     if (!activeToken) {
       setUser(null);
@@ -19,6 +26,9 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const res = await fetch(`${API_BASE}/auth/me`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit',
         headers: {
           'Authorization': `Bearer ${activeToken}`,
           'Content-Type': 'application/json'
@@ -31,27 +41,34 @@ export const AuthProvider = ({ children }) => {
         logout();
       }
     } catch (err) {
-      console.error('Failed to fetch user:', err);
+      console.error('[AuthContext] Failed to fetch user profile:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, logout]);
 
   useEffect(() => {
     fetchUserProfile();
-  }, [token]);
+  }, [fetchUserProfile]);
 
   const login = async (email, password) => {
     try {
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        credentials: 'omit',
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify({ email, password })
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        return { success: false, error: data.message || 'Login failed.' };
+        return { 
+          success: false, 
+          error: data.error || data.message || 'Invalid email or password.' 
+        };
       }
 
       localStorage.setItem('token', data.token);
@@ -59,7 +76,11 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (err) {
-      return { success: false, error: 'Could not connect to the authentication server.' };
+      console.error('[AuthContext] Login connection error:', err);
+      return { 
+        success: false, 
+        error: 'Unable to connect to server. If the server was sleeping, please wait 30 seconds and try again.' 
+      };
     }
   };
 
@@ -67,13 +88,20 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        credentials: 'omit',
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify(userData)
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        return { success: false, error: data.message || data.error || (data.errors && data.errors[0]?.msg) || 'Registration failed.' };
+        return { 
+          success: false, 
+          error: data.error || data.message || (data.errors && data.errors[0]?.msg) || 'Registration failed.' 
+        };
       }
 
       localStorage.setItem('token', data.token);
@@ -81,15 +109,12 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (err) {
-      return { success: false, error: 'Could not connect to the registration server.' };
+      console.error('[AuthContext] Registration connection error:', err);
+      return { 
+        success: false, 
+        error: 'Unable to connect to server. If the server was sleeping, please wait 30 seconds and try again.' 
+      };
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    sessionStorage.clear();
-    setToken(null);
-    setUser(null);
   };
 
   const updateUserProfile = async (updates) => {
@@ -97,20 +122,23 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await fetch(`${API_BASE}/user/profile`, {
         method: 'POST',
+        mode: 'cors',
+        credentials: 'omit',
         headers: {
           'Authorization': `Bearer ${activeToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(updates)
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setUser(data.user);
-        return { success: true, message: data.message };
+        return { success: true, message: data.message || 'Profile updated successfully!' };
       }
-      return { success: false, message: data.message };
+      return { success: false, message: data.message || data.error || 'Failed to update profile.' };
     } catch (err) {
-      return { success: false, message: err.message };
+      console.error('[AuthContext] Update profile error:', err);
+      return { success: false, message: err.message || 'Network error updating profile.' };
     }
   };
 
