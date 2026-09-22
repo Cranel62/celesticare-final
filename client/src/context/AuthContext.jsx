@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api').replace(/\/$/, '');
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -49,16 +49,9 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password })
       });
 
-      const text = await res.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        return { success: false, error: 'API route not reachable. Please check backend connection.' };
-      }
-
+      const data = await res.json();
       if (!res.ok) {
-        return { success: false, error: data.message || 'Login failed' };
+        return { success: false, error: data.message || 'Login failed.' };
       }
 
       localStorage.setItem('token', data.token);
@@ -66,7 +59,7 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (err) {
-      return { success: false, error: err.message || 'Network error' };
+      return { success: false, error: 'Could not connect to the authentication server.' };
     }
   };
 
@@ -78,16 +71,9 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify(userData)
       });
 
-      const text = await res.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        return { success: false, error: 'API route not reachable.' };
-      }
-
+      const data = await res.json();
       if (!res.ok) {
-        return { success: false, error: data.message || 'Registration failed' };
+        return { success: false, error: data.message || 'Registration failed.' };
       }
 
       localStorage.setItem('token', data.token);
@@ -95,7 +81,7 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       return { success: true, user: data.user };
     } catch (err) {
-      return { success: false, error: err.message || 'Network error' };
+      return { success: false, error: 'Could not connect to the registration server.' };
     }
   };
 
