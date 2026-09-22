@@ -1,0 +1,15 @@
+.pageWrapper {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #8e57b375 0%, #634b8653 100%);
+  font-family: 'Poppins', sans-serif; padding-top: 80px;
+}
+.setupContainer { width: 100%; max-width: 440px; padding: 20px; }
+.setupBox { background: #2e2e2e; color: #fff; padding: 40px; border-radius: 20px; text-align: center; }
+.brandTitle { font-weight: 700; font-size: 22px; margin-bottom: 8px; }
+.formControl {
+  width: 100%; background: #4b4b4b; border: none; color: #fff; border-radius: 25px; padding: 12px 18px; margin-bottom: 16px;
+}
+.btnContinue {
+  width: 100%; background: #6b5b95; color: #fff; border: none; border-radius: 25px; padding: 12px; font-weight: 600; cursor: pointer;
+}

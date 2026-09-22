@@ -1,0 +1,22 @@
+.zodiacPage {
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  font-family: 'Poppins', sans-serif;
+  color: white;
+  padding-top: 80px;
+}
+.pageOverlay { min-height: 100vh; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+.mainContent { text-align: center; padding: 40px 20px; }
+.heading { font-size: 2.5rem; font-weight: 700; margin-bottom: 40px; }
+.diamondContainer { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+.diamondWrapper { cursor: pointer; transition: transform 0.3s ease; }
+.diamondWrapper:hover { transform: translateY(-5px); }
+.signCard {
+  width: 220px; height: 220px; background: rgba(255,255,255,0.1); border-radius: 20px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.vectorBg { width: 80px; height: 80px; object-fit: contain; margin-bottom: 12px; }
+.signName { font-weight: 700; font-size: 1.2rem; }
+.cta { background: #000; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; }

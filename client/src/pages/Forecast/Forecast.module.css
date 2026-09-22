@@ -1,0 +1,21 @@
+.mysticalContainer {
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 50%, #1a0f0f 0%, #0a0505 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Poppins', sans-serif; color: #fff; padding-top: 80px;
+}
+.selectionContainer { max-width: 700px; padding: 40px 20px; text-align: center; }
+.oracleTitle { font-size: 2.6rem; color: #f7e1b5; margin-bottom: 10px; font-weight: 700; }
+.oracleSubtitle { color: #c9b4a4; margin-bottom: 30px; font-size: 1.05rem; }
+.btnSelectMode {
+  background: #8a6a9a; color: white; border: none; padding: 12px 30px; border-radius: 25px;
+  font-weight: 600; cursor: pointer; font-size: 1rem;
+}
+.btnSelectMode:hover { background: #b59dab; }
+.readingOptionCard {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px;
+  padding: 30px; backdrop-filter: blur(10px);
+}
+.optionIcon { font-size: 3rem; margin-bottom: 12px; }
+.optionTitle { font-size: 1.5rem; color: #fce8f3; margin-bottom: 8px; }
+.optionDesc { color: #baa4b5; line-height: 1.6; }

@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+.dashboardPage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #d3bff5 0%, #3c3b7d 100%);
+  font-family: 'Poppins', sans-serif;
+  padding: 120px 20px 60px;
+}
+.container { max-width: 1100px; margin: 0 auto; }
+.mainCard { background: #ffffff; border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+.headerTitle { color: #6a1b9a; font-weight: 700; }
+.headerSubtitle { color: #6c757d; font-size: 0.95rem; }
+.btnEditProfile {
+  background: #7a3da1; color: white; border: none; border-radius: 25px; padding: 10px 24px; cursor: pointer; font-weight: 600;
+}
+.gridContainer { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top: 24px; }
+.profileSection, .astroSection { background: #f8fafc; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; }
+.sectionTitle { font-size: 1.15rem; font-weight: 700; color: #1e293b; margin-bottom: 16px; }
+.profileItem { margin-bottom: 8px; font-size: 0.9rem; color: #334155; }
+.profileLabel { font-weight: 600; color: #7a3da1; min-width: 90px; display: inline-block; }
+.zodiacName { font-size: 1.3rem; font-weight: 700; color: #6a1b9a; }
+.astroGlowBtn {
+  display: inline-block; background: #000; color: white; text-decoration: none; padding: 10px 24px; border-radius: 25px; font-weight: 600; font-size: 0.85rem;
+}
+.modalOverlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999;
+}
+.modalContent { background: #2e2e2e; color: #fff; padding: 30px; border-radius: 20px; width: 100%; max-width: 480px; }
+.modalHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.closeModalBtn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+.formControl {
+  width: 100%; background: #4b4b4b; border: none; color: #fff; padding: 12px 16px; border-radius: 20px; margin-bottom: 14px;
+}
+.btnSave {
+  width: 100%; background: #6b5b95; color: #fff; border: none; padding: 12px; border-radius: 20px; font-weight: 600; cursor: pointer;
+}
