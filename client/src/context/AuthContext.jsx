@@ -1,194 +1,148 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api';
+
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(true);
 
-  const getHeaders = () => {
-    const token = localStorage.getItem('celesticare_token');
-    return {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` })
-    };
-  };
-
-  const checkSession = async () => {
-    const token = localStorage.getItem('celesticare_token');
-    if (!token) {
+  const fetchUserProfile = async () => {
+    const activeToken = token || localStorage.getItem('token');
+    if (!activeToken) {
       setUser(null);
       setLoading(false);
       return;
     }
+
     try {
-      const response = await fetch('/api/auth/me', { headers: getHeaders() });
-      if (!response.ok) {
-        setUser(null);
-        localStorage.removeItem('celesticare_token');
-        return;
-      }
-      const data = await response.json();
-      if (data.authenticated && data.user) {
+      const res = await fetch(`${API_BASE}/auth/me`, {
+        headers: {
+          'Authorization': `Bearer ${activeToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await res.json();
+      if (res.ok && data.user) {
         setUser(data.user);
-        if (data.user.zodiac_sign) sessionStorage.setItem('zodiac_sign', data.user.zodiac_sign);
-        if (data.user.undertone) sessionStorage.setItem('undertone', data.user.undertone);
-        if (data.user.season) sessionStorage.setItem('season', data.user.season);
       } else {
-        setUser(null);
+        logout();
       }
-    } catch {
-      setUser(null);
+    } catch (err) {
+      console.error('Failed to fetch user:', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    checkSession();
-  }, []);
+    fetchUserProfile();
+  }, [token]);
 
-  const fetchUserProfile = async () => {
+  const login = async (email, password) => {
     try {
-      const res = await fetch('/api/user/profile', { headers: getHeaders() });
-      if (!res.ok) {
-        if (res.status === 401) setUser(null);
-        return null;
-      }
-      const data = await res.json();
-      if (data.success && data.user) {
-        setUser(data.user);
-        return data.user;
-      }
-    } catch {
-      setUser(null);
-    }
-    return null;
-  };
-
-  const createProfile = async (profileData) => {
-    try {
-      const res = await fetch('/api/user/profile', {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify(profileData)
-      });
-      const data = await res.json();
-      if (data.success && data.user) {
-        setUser(data.user);
-      }
-      return data;
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  };
-
-  const updateUserProfile = async (formData) => {
-    try {
-      const res = await fetch('/api/user/profile', {
-        method: 'PUT',
-        headers: getHeaders(),
-        body: JSON.stringify(formData)
-      });
-      const data = await res.json();
-      if (data.success && data.user) {
-        setUser(data.user);
-      }
-      return data;
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  };
-
-  const deleteUserProfile = async () => {
-    try {
-      const res = await fetch('/api/user/profile', {
-        method: 'DELETE',
-        headers: getHeaders()
-      });
-      const data = await res.json();
-      if (data.success) {
-        setUser(null);
-        localStorage.removeItem('celesticare_token');
-        sessionStorage.clear();
-      }
-      return data;
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  };
-
-  const loginUser = async (userDataOrEmail, password) => {
-    if (userDataOrEmail && typeof userDataOrEmail === 'object') {
-      setUser(userDataOrEmail);
-      return { success: true, user: userDataOrEmail };
-    }
-
-    const email = userDataOrEmail;
-    try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      const data = await res.json();
-      if (data.success && data.user) {
-        if (data.token) localStorage.setItem('celesticare_token', data.token);
-        setUser(data.user);
+
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        return { success: false, error: 'API route not reachable. Please check backend connection.' };
       }
-      return data;
+
+      if (!res.ok) {
+        return { success: false, error: data.message || 'Login failed' };
+      }
+
+      localStorage.setItem('token', data.token);
+      setToken(data.token);
+      setUser(data.user);
+      return { success: true, user: data.user };
     } catch (err) {
-      return { success: false, error: err.message };
+      return { success: false, error: err.message || 'Network error' };
     }
   };
 
-  const logoutUser = async () => {
+  const register = async (userData) => {
     try {
-      await fetch('/api/auth/logout', {
+      const res = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
-        headers: getHeaders()
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
       });
+
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        return { success: false, error: 'API route not reachable.' };
+      }
+
+      if (!res.ok) {
+        return { success: false, error: data.message || 'Registration failed' };
+      }
+
+      localStorage.setItem('token', data.token);
+      setToken(data.token);
+      setUser(data.user);
+      return { success: true, user: data.user };
     } catch (err) {
-      console.error('Logout error:', err);
-    } finally {
-      setUser(null);
-      localStorage.removeItem('celesticare_token');
-      sessionStorage.clear();
+      return { success: false, error: err.message || 'Network error' };
     }
   };
 
-  const updateUserProfileData = (fields) => {
-    setUser(prev => (prev ? { ...prev, ...fields } : fields));
-    Object.entries(fields).forEach(([k, v]) => {
-      if (v) sessionStorage.setItem(k, v);
-    });
+  const logout = () => {
+    localStorage.removeItem('token');
+    sessionStorage.clear();
+    setToken(null);
+    setUser(null);
+  };
+
+  const updateUserProfile = async (updates) => {
+    const activeToken = token || localStorage.getItem('token');
+    try {
+      const res = await fetch(`${API_BASE}/user/profile`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${activeToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updates)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUser(data.user);
+        return { success: true, message: data.message };
+      }
+      return { success: false, message: data.message };
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: Boolean(user),
-        loading,
-        fetchUserProfile,
-        createProfile,
-        updateUserProfile,
-        deleteUserProfile,
-        loginUser,
-        logoutUser,
-        updateUserProfileData,
-        checkSession
-      }}
-    >
+    <AuthContext.Provider value={{
+      user,
+      token,
+      loading,
+      isAuthenticated: Boolean(token && user),
+      login,
+      register,
+      logout,
+      fetchUserProfile,
+      updateUserProfile
+    }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used inside an AuthProvider');
-  }
-  return context;
-}
+export const useAuth = () => useContext(AuthContext);
