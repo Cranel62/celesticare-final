@@ -3,24 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Dashboard.module.css';
 
-import warmWheelImg from '../../assets/images/warm_wheel.png';
-import coolWheelImg from '../../assets/images/cool_wheel.png';
-import neutralWheelImg from '../../assets/images/neutral_wheel.png';
-import dashboardArtwork from '../../assets/images/dashboard.png';
-import vectorArtwork from '../../assets/images/vector.png';
-import zodiacCircleArtwork from '../../assets/images/zodiac_circle.png';
-import fireBg from '../../assets/images/fire_bg.jpeg';
-import airBg from '../../assets/images/air_bg.jpeg';
-import waterBg from '../../assets/images/water_bg.jpeg';
-import warmSkin from '../../assets/images/warm_skin.png';
-
-const API_BASE = 'https://celesticare-api.onrender.com';
-
-function getCookie(name) {
-  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  return match ? decodeURIComponent(match[2]) : null;
-}
-
 const ZODIAC_DETAILS = {
   Aries: { personality: "Energetic, bold, confident, and adventurous.", element: "Fire", planet: "Mars", lucky_numbers: "1, 9, 14", strengths: "Courageous, passionate, determined", weaknesses: "Impulsive, impatient, short-tempered", traits: "Action and leadership.", compatibility: "Leo and Sagittarius." },
   Taurus: { personality: "Patient, reliable, practical, and loving.", element: "Earth", planet: "Venus", lucky_numbers: "2, 6, 9", strengths: "Loyal, persistent, trustworthy", weaknesses: "Stubborn, possessive", traits: "Comfort and stability.", compatibility: "Virgo and Capricorn." },
@@ -36,35 +18,30 @@ const ZODIAC_DETAILS = {
   Pisces: { personality: "Compassionate, artistic, gentle, and empathetic.", element: "Water", planet: "Neptune", lucky_numbers: "3, 9, 12", strengths: "Imaginative, kind, intuitive", weaknesses: "Escapist, emotional", traits: "Creativity and spirituality.", compatibility: "Cancer and Scorpio." }
 };
 
-const AESTHETICS = {
-  academia: { title: "The Scholar", color: "#271a0e", side1: dashboardArtwork },
-  boho: { title: "The Bohemian Dreamer", color: "#e38153", side1: vectorArtwork },
-  coquette: { title: "The Coquette Muse", color: "#f5c4d4", side1: zodiacCircleArtwork },
-  grunge: { title: "The Rebel Soul", color: "#a1a1a1", side1: warmSkin },
-  punk: { title: "The Anarchic Icon", color: "#ff0000", side1: fireBg },
-  y2k: { title: "The Futuristic Popstar", color: "#d46be3", side1: airBg },
-  luxurious: { title: "The Luxe Visionary", color: "#c93939", side1: waterBg }
-};
+const calculateZodiacSign = (birthdate) => {
+  if (!birthdate) return '';
+  const [year, monthStr, dayStr] = birthdate.split('-');
+  const month = parseInt(monthStr, 10);
+  const day = parseInt(dayStr, 10);
 
-const STYLES = {
-  minimalist: { name: 'Minimalist Elegance', color: 'linear-gradient(135deg, #f8fafc, #e2e8f0)', textColor: '#374151' },
-  businesswear: { name: 'Professional Businesswear', color: 'linear-gradient(135deg, #1e3a8a, #3730a3)', textColor: '#ffffff' },
-  elegant: { name: 'Classic Elegance', color: 'linear-gradient(135deg, #7e22ce, #c084fc)', textColor: '#ffffff' },
-  creative: { name: 'Creative Expression', color: 'linear-gradient(135deg, #ea580c, #f59e0b)', textColor: '#ffffff' },
-  soft: { name: 'Soft Elegance', color: 'linear-gradient(135deg, #f9a8d4, #f472b6)', textColor: '#ffffff' },
-  rough: { name: 'Rough Edge', color: 'linear-gradient(135deg, #4b5563, #6b7280)', textColor: '#ffffff' },
-  streetwear: { name: 'Urban Streetwear', color: 'linear-gradient(135deg, #000000, #374151)', textColor: '#ffffff' }
-};
-
-const COLOR_PALETTES = {
-  Warm: ["#E69A5B", "#F5C16C", "#D76A03", "#C25B02", "#FFD27F"],
-  Cool: ["#5B7BE6", "#A3C1F7", "#7089E3", "#4059C2", "#9EB8FF"],
-  Neutral: ["#D7BFAE", "#C1B3A4", "#A8988B", "#8B7C6F", "#BFA98B"]
+  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'Aries';
+  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'Taurus';
+  if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'Gemini';
+  if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return 'Cancer';
+  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'Leo';
+  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 'Virgo';
+  if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return 'Libra';
+  if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return 'Scorpio';
+  if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return 'Sagittarius';
+  if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return 'Capricorn';
+  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'Aquarius';
+  if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return 'Pisces';
+  return '';
 };
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { user, isAuthenticated, loading, fetchUserProfile, updateUserProfile, deleteUserProfile } = useAuth();
+  const { user, isAuthenticated, loading, fetchUserProfile, updateUserProfile } = useAuth();
   const [showEditModal, setShowEditModal] = useState(false);
   const [alertInfo, setAlertInfo] = useState({ text: '', type: '' });
   const [editForm, setEditForm] = useState({ name: '', gender: '', birthdate: '', zodiac_sign: '' });
@@ -74,7 +51,6 @@ export default function Dashboard() {
       navigate('/login');
       return;
     }
-    fetchUserProfile();
     if (user) {
       setEditForm({
         name: user.name || '',
@@ -83,22 +59,36 @@ export default function Dashboard() {
         zodiac_sign: user.zodiac_sign || ''
       });
     }
-  }, [loading, isAuthenticated]);
+  }, [loading, isAuthenticated, user]);
+
+  const handleBirthdateChange = (e) => {
+    const bdate = e.target.value;
+    const computedZodiac = calculateZodiacSign(bdate);
+    setEditForm((prev) => ({
+      ...prev,
+      birthdate: bdate,
+      zodiac_sign: computedZodiac || prev.zodiac_sign
+    }));
+  };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    const res = await updateUserProfile(editForm);
+    const computedZodiac = calculateZodiacSign(editForm.birthdate) || editForm.zodiac_sign;
+    const payload = { ...editForm, zodiac_sign: computedZodiac };
+
+    const res = await updateUserProfile(payload);
     if (res.success) {
       setAlertInfo({ text: 'Profile updated successfully!', type: 'success' });
+      await fetchUserProfile();
       setShowEditModal(false);
     } else {
-      setAlertInfo({ text: res.error || 'Failed to update', type: 'error' });
+      setAlertInfo({ text: res.message || res.error || 'Failed to update', type: 'error' });
     }
   };
 
   if (loading || !user) return null;
 
-  const currentZodiac = user.zodiac_sign || 'Aries';
+  const currentZodiac = user.zodiac_sign || calculateZodiacSign(user.birthdate) || 'Aries';
   const zodiacData = ZODIAC_DETAILS[currentZodiac] || ZODIAC_DETAILS.Aries;
 
   return (
@@ -173,7 +163,7 @@ export default function Dashboard() {
                 type="date"
                 className={styles.formControl}
                 value={editForm.birthdate}
-                onChange={(e) => setEditForm({ ...editForm, birthdate: e.target.value })}
+                onChange={handleBirthdateChange}
               />
               <button type="submit" className={styles.btnSave}>Save Changes</button>
             </form>

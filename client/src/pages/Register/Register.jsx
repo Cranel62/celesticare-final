@@ -24,29 +24,7 @@ export default function Register() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMessage('');
-
-    if (formData.password !== formData.confirm_password) {
-      setErrorMessage('Passwords do not match.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const result = await register(formData);
-      if (result.success) {
-        navigate('/dashboard');
-      } else {
-        setErrorMessage(result.error || 'Registration failed.');
-      }
-    } catch (err) {
-      setErrorMessage('Server connection error.');
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleSubmit = async (e) => {
 
   return (
     <div className={styles.loginPageWrapper}>
@@ -134,4 +112,4 @@ export default function Register() {
       </div>
     </div>
   );
-}
+}}
