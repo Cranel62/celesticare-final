@@ -14,7 +14,7 @@ import airBg from '../../assets/images/air_bg.jpeg';
 import waterBg from '../../assets/images/water_bg.jpeg';
 import warmSkin from '../../assets/images/warm_skin.png';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://celesticare-api.onrender.com';
 
 function getCookie(name) {
   const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
