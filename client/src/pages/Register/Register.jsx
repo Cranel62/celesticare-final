@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import styles from '../Login/Login.module.css';
+import styles from './Register.module.css';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -24,7 +24,29 @@ export default function Register() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage('');
+
+    if (formData.password !== formData.confirm_password) {
+      setErrorMessage('Passwords do not match.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await register(formData);
+      if (result.success) {
+        navigate('/get-to-know');
+      } else {
+        setErrorMessage(result.error || 'Registration failed.');
+      }
+    } catch (err) {
+      setErrorMessage('Server connection error.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className={styles.loginPageWrapper}>
@@ -112,4 +134,4 @@ const handleSubmit = async (e) => {
       </div>
     </div>
   );
-}}
+}
