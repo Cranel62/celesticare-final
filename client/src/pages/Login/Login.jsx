@@ -1,85 +1,112 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Login.module.css';
 
-const ADMIN_EMAIL_DOMAIN = '@celesticare.admin.com';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate();
-  const { loginUser } = useAuth();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail || !password) {
-      setErrorMessage('Both fields are required.');
-      return;
-    }
+    setLoading(true);
 
-    setIsLoading(true);
-    const res = await loginUser(trimmedEmail, password);
-    setIsLoading(false);
-
-    if (res.success) {
-      const isAdmin = trimmedEmail.toLowerCase().includes(ADMIN_EMAIL_DOMAIN);
-      navigate(isAdmin ? '/admin' : '/');
-    } else {
-      setErrorMessage(res.error || 'Invalid email or password.');
+    try {
+      const result = await login(formData.email, formData.password);
+      if (result.success) {
+        if (result.user?.role === 'admin' || result.user?.is_admin) {
+          navigate('/dashboard');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        setErrorMessage(result.error || 'Invalid email or password.');
+      }
+    } catch (err) {
+      setErrorMessage('Unable to connect to the server. Please check your network.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className={styles.loginPageWrapper}>
-      <div className={styles.loginBox}>
-        <button className={styles.closeBtn} onClick={() => navigate('/')}>
-          <i className="fas fa-times"></i>
-        </button>
+    <div className={styles.loginContainer}>
+      <div className={styles.loginCard}>
         <div className={styles.brandTitle}>CELESTICARE</div>
-        <h2 className={styles.loginHeading}>Log in to your profile</h2>
+        <div className={styles.subTitle}>Log in to your profile</div>
 
-        {errorMessage && <div className={styles.alertDanger}>{errorMessage}</div>}
+        {errorMessage && (
+          <div className="alert alert-danger" style={{ 
+            backgroundColor: '#f8d7da', 
+            color: '#721c24', 
+            padding: '10px 15px', 
+            borderRadius: '10px', 
+            marginBottom: '15px',
+            fontSize: '0.9rem'
+          }}>
+            {errorMessage}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            className={styles.formControl}
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <div className={styles.passwordContainer}>
+          <div className={styles.inputGroup}>
             <input
-              type={showPassword ? 'text' : 'password'}
-              className={styles.formControl}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="email"
+              name="email"
+              placeholder="Email"
+              className={styles.inputField}
+              value={formData.email}
+              onChange={handleChange}
               required
             />
-            <button
-              type="button"
-              className={styles.togglePassword}
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              <i className={showPassword ? 'far fa-eye-slash' : 'far fa-eye'}></i>
-            </button>
           </div>
-          <button type="submit" className={styles.btnLogin} disabled={isLoading}>
-            {isLoading ? 'Logging in...' : 'Login'}
+
+          <div className={styles.inputGroup} style={{ position: 'relative' }}>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Password"
+              className={styles.inputField}
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute',
+                right: '15px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                cursor: 'pointer',
+                color: '#888'
+              }}
+            >
+              <i className={showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'}></i>
+            </span>
+          </div>
+
+          <button type="submit" className={styles.loginBtn} disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
           </button>
-          <p className={styles.textMuted}>
-            Don't have a profile? <Link to="/register">Sign up</Link>
-          </p>
         </form>
+
+        <div className={styles.footerText}>
+          Don't have a profile? <Link to="/register" className={styles.linkText}>Sign up</Link>
+        </div>
       </div>
     </div>
   );
