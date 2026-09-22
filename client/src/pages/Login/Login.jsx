@@ -3,8 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Login.module.css';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api';
-
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -27,11 +25,7 @@ export default function Login() {
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
-        if (result.user?.role === 'admin' || result.user?.is_admin) {
-          navigate('/dashboard');
-        } else {
-          navigate('/dashboard');
-        }
+        navigate('/dashboard');
       } else {
         setErrorMessage(result.error || 'Invalid email or password.');
       }
@@ -43,69 +37,56 @@ export default function Login() {
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <div className={styles.loginCard}>
+    <div className={styles.loginPageWrapper}>
+      <div className={styles.loginBox}>
         <div className={styles.brandTitle}>CELESTICARE</div>
-        <div className={styles.subTitle}>Log in to your profile</div>
+        <div className={styles.loginHeading}>Log in to your profile</div>
 
         {errorMessage && (
-          <div className="alert alert-danger" style={{ 
-            backgroundColor: '#f8d7da', 
-            color: '#721c24', 
-            padding: '10px 15px', 
-            borderRadius: '10px', 
-            marginBottom: '15px',
-            fontSize: '0.9rem'
-          }}>
+          <div className={styles.alertDanger}>
             {errorMessage}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className={styles.inputGroup}>
+          <div>
             <input
               type="email"
               name="email"
               placeholder="Email"
-              className={styles.inputField}
+              className={styles.formControl}
               value={formData.email}
               onChange={handleChange}
               required
             />
           </div>
 
-          <div className={styles.inputGroup} style={{ position: 'relative' }}>
+          <div className={styles.passwordContainer}>
             <input
               type={showPassword ? 'text' : 'password'}
               name="password"
               placeholder="Password"
-              className={styles.inputField}
+              className={styles.formControl}
               value={formData.password}
               onChange={handleChange}
               required
             />
-            <span
+            <button
+              type="button"
+              className={styles.togglePassword}
               onClick={() => setShowPassword(!showPassword)}
-              style={{
-                position: 'absolute',
-                right: '15px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                cursor: 'pointer',
-                color: '#888'
-              }}
             >
-              <i className={showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'}></i>
-            </span>
+              {showPassword ? '👁' : '🔒'}
+            </button>
           </div>
 
-          <button type="submit" className={styles.loginBtn} disabled={loading}>
+          <button type="submit" className={styles.btnLogin} disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
-        <div className={styles.footerText}>
-          Don't have a profile? <Link to="/register" className={styles.linkText}>Sign up</Link>
+        <div className={styles.textMuted}>
+          Don't have a profile? <Link to="/register">Sign up</Link>
         </div>
       </div>
     </div>
