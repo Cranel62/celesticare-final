@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
 
       const data = await res.json();
       if (!res.ok) {
-        return { success: false, error: data.message || 'Registration failed.' };
+        return { success: false, error: data.message || data.error || (data.errors && data.errors[0]?.msg) || 'Registration failed.' };
       }
 
       localStorage.setItem('token', data.token);
