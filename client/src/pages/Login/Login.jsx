@@ -25,12 +25,17 @@ export default function Login() {
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
-        navigate('/dashboard');
+        // If administrator, route straight to the admin management dashboard
+        if (result.user?.is_admin || result.user?.role === 'admin') {
+          navigate('/admin/users');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         setErrorMessage(result.error || 'Invalid email or password.');
       }
     } catch (err) {
-      setErrorMessage('Unable to connect to the server. Please check your network.');
+      setErrorMessage('Unable to connect to Render server. Please wait a moment and try again.');
     } finally {
       setLoading(false);
     }
@@ -81,7 +86,7 @@ export default function Login() {
           </div>
 
           <button type="submit" className={styles.btnLogin} disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Connecting to Render...' : 'Login'}
           </button>
         </form>
 

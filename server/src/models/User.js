@@ -31,6 +31,8 @@ const userSchema = new mongoose.Schema(
       default: 'user'
     },
     is_admin: { type: Boolean, default: false },
+    deleted_at: { type: Date, default: null },
+    show_reset_notification: { type: Boolean, default: false },
     zodiac_sign: { type: String, default: null },
     undertone: { type: String, default: null },
     birthdate: { type: String, default: null },
@@ -51,7 +53,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Mongoose 9 Async Pre-Save Hook (No `next` parameter)
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
   const salt = await bcrypt.genSalt(10);

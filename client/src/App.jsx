@@ -9,6 +9,8 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Zodiac from './pages/Zodiac/Zodiac';
 import Forecast from './pages/Forecast/Forecast';
 import GetToKnow from './pages/GetToKnow/GetToKnow';
+import AdminUsers from './pages/Admin/AdminUsers';
+import AdminUserDetail from './pages/Admin/AdminUserDetail';
 
 export default function App() {
   return (
@@ -23,6 +25,11 @@ export default function App() {
           <Route path="/zodiac" element={<Zodiac />} />
           <Route path="/forecast" element={<Forecast />} />
           <Route path="/get-to-know" element={<GetToKnow />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminUsers />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/user/:id" element={<AdminUserDetail />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

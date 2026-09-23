@@ -17,6 +17,8 @@ export default function Navbar() {
     navigate('/login');
   };
 
+  const isAdmin = Boolean(user && (user.is_admin || user.role === 'admin'));
+
   return (
     <nav className={`navbar navbar-expand-lg ${styles.navbar}`}>
       <div className="container-fluid" style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -38,6 +40,16 @@ export default function Navbar() {
           <ul className={styles.navbarNav}>
             {isAuthenticated ? (
               <>
+                {/* Visible ONLY to Administrators */}
+                {isAdmin && (
+                  <li className={styles.navItem}>
+                    <Link to="/admin/users" className={styles.navLink} onClick={closeMenu} style={{ color: '#ffc107', fontWeight: '600' }}>
+                      <i className={`fas fa-shield-alt ${styles.navFaIcon}`} style={{ color: '#ffc107' }}></i>
+                      <span>Admin Panel</span>
+                    </Link>
+                  </li>
+                )}
+
                 <li className={styles.navItem}>
                   <Link to="/dashboard" className={styles.navLink} onClick={closeMenu}>
                     <i className={`fas fa-th-large ${styles.navFaIcon}`}></i>

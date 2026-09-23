@@ -2,7 +2,11 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 const AuthContext = createContext();
 
-const API_BASE = import.meta.env.PROD ? '/api' : (import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api').replace(/\/$/, '');
+// In production on Vercel, use same-origin '/api' (proxied via vercel.json to Render)
+// In local dev without proxy, talk directly to the live Render backend
+const API_BASE = import.meta.env.PROD 
+  ? '/api' 
+  : 'https://celesticare-api.onrender.com/api';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -79,7 +83,7 @@ export const AuthProvider = ({ children }) => {
       console.error('[AuthContext] Login connection error:', err);
       return { 
         success: false, 
-        error: 'Unable to connect to server. If the server was sleeping, please wait 30 seconds and try again.' 
+        error: 'Unable to connect to the Render API. If the server is sleeping, please wait 30 seconds and retry.' 
       };
     }
   };
@@ -112,7 +116,7 @@ export const AuthProvider = ({ children }) => {
       console.error('[AuthContext] Registration connection error:', err);
       return { 
         success: false, 
-        error: 'Unable to connect to server. If the server was sleeping, please wait 30 seconds and try again.' 
+        error: 'Unable to connect to the Render API. If the server is sleeping, please wait 30 seconds and retry.' 
       };
     }
   };
