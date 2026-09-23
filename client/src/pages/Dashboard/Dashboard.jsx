@@ -52,11 +52,7 @@ export default function Dashboard() {
         navigate('/login', { replace: true });
         return;
       }
-      // DEDICATED SEPARATION: Admins must use the Admin Dashboard, not the user page
-      if (user?.is_admin || user?.role === 'admin') {
-        navigate('/admin/users', { replace: true });
-        return;
-      }
+      // Removed the admin redirect block so admins can view the dashboard
     }
 
     if (user) {
@@ -96,11 +92,9 @@ export default function Dashboard() {
 
   if (loading || !user) return null;
 
-  // Don't render user dashboard for admin users (prevents brief flash before redirect)
-  if (user.is_admin || user.role === 'admin') return null;
-
   const currentZodiac = user.zodiac_sign || calculateZodiacSign(user.birthdate) || 'Aries';
   const zodiacData = ZODIAC_DETAILS[currentZodiac] || ZODIAC_DETAILS.Aries;
+  const isAdmin = user.is_admin || user.role === 'admin';
 
   return (
     <div className={styles.dashboardPage}>
@@ -111,14 +105,25 @@ export default function Dashboard() {
       )}
       <div className={styles.container}>
         <div className={styles.mainCard}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
             <div>
               <h2 className={styles.headerTitle}>Welcome, {user.username}!</h2>
               <p className={styles.headerSubtitle}>Your celestial styling and healthcare dashboard.</p>
             </div>
-            <button className={styles.btnEditProfile} onClick={() => setShowEditModal(true)}>
-              Edit Profile
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              {isAdmin && (
+                <button 
+                  className={styles.btnEditProfile} 
+                  style={{ background: '#4b3f77', color: '#fff', border: 'none' }}
+                  onClick={() => navigate('/admin/users')}
+                >
+                  <i className="fas fa-users-cog me-2"></i> Admin Panel
+                </button>
+              )}
+              <button className={styles.btnEditProfile} onClick={() => setShowEditModal(true)}>
+                Edit Profile
+              </button>
+            </div>
           </div>
 
           <div className={styles.gridContainer}>
@@ -133,6 +138,9 @@ export default function Dashboard() {
                 <div className={styles.profileItem}><span className={styles.profileLabel}>Zodiac:</span> {currentZodiac}</div>
                 <div className={styles.profileItem}><span className={styles.profileLabel}>Undertone:</span> {user.undertone ? user.undertone.toUpperCase() : 'Not set'}</div>
                 <div className={styles.profileItem}><span className={styles.profileLabel}>Season:</span> {user.season || 'Not set'}</div>
+                {isAdmin && (
+                  <div className={styles.profileItem}><span className={styles.profileLabel}>Role:</span> <span style={{ color: '#dc3545', fontWeight: 'bold' }}>Administrator</span></div>
+                )}
               </div>
             </div>
 
