@@ -7,6 +7,7 @@ import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Zodiac from './pages/Zodiac/Zodiac';
+import ZodiacResult from './pages/Zodiac/ZodiacResult';
 import Forecast from './pages/Forecast/Forecast';
 import GetToKnow from './pages/GetToKnow/GetToKnow';
 import AdminUsers from './pages/Admin/AdminUsers';
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/zodiac" element={<Zodiac />} />
+          <Route path="/zodiac/zodiac-result" element={<ZodiacResult />} />
           <Route path="/forecast" element={<Forecast />} />
           <Route path="/get-to-know" element={<GetToKnow />} />
           

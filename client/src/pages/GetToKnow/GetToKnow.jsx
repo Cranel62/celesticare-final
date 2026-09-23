@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './GetToKnow.module.css';
 
-// Exact zodiac date calculation logic
+// Exact zodiac date calculation logic from get_to_know.php
 export const calculateZodiacSign = (birthdate) => {
   if (!birthdate) return '';
   const date = new Date(birthdate);
@@ -68,7 +68,7 @@ export default function GetToKnow() {
     const { name, birthdate, gender } = formData;
     const zodiac_sign = calculateZodiacSign(birthdate);
 
-    // 1. Cache to browser storage & cookies
+    // Save to sessionStorage and cookies for guest and session persistence
     sessionStorage.setItem('name', name);
     sessionStorage.setItem('birthdate', birthdate);
     sessionStorage.setItem('gender', gender);
@@ -80,7 +80,6 @@ export default function GetToKnow() {
     setCookie('gender', gender, 30);
     setCookie('zodiac_sign', zodiac_sign, 30);
 
-    // 2. Call AuthContext helper if provided
     if (typeof updateUserProfile === 'function') {
       try {
         await updateUserProfile({ name, birthdate, gender, zodiac_sign });
@@ -89,7 +88,6 @@ export default function GetToKnow() {
       }
     }
 
-    // 3. Persist to API if authenticated
     const effectiveUserId = user?.id || user?.sql_id;
     if (effectiveUserId) {
       try {
@@ -113,7 +111,7 @@ export default function GetToKnow() {
       }
     }
 
-    // 4. Navigate directly to Zodiac Result
+    // Direct routing to Zodiac Result
     navigate('/zodiac/zodiac-result');
   };
 
