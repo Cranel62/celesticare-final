@@ -2,9 +2,12 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 const AuthContext = createContext();
 
-// 1. If VITE_API_BASE_URL is defined (e.g., http://localhost:5000/api in your local .env), use it.
-// 2. In production on Vercel, proxy via '/api'.
-// 3. Otherwise, fallback directly to the Render cloud backend.
+//const API_BASE = import.meta.env.PROD ? '/api' : (import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api').replace(/\/$/, '');
+
+// 1. If VITE_API_BASE_URL is set (in .env or .env.local), use it.
+// 2. In production on Vercel, use same-origin '/api' (proxied via vercel.json to Render).
+// 3. Otherwise, fallback directly to the live Render backend.
+
 const getApiBase = () => {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
@@ -13,8 +16,7 @@ const getApiBase = () => {
     ? '/api' 
     : 'https://celesticare-api.onrender.com/api';
 };
-
-const API_BASE = getApiBase();
+*/
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -46,7 +48,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json'
         }
       });
-      const data = await res.json().catch(() => ({}));
+      const data = await res.json();
       if (res.ok && data.user) {
         setUser(data.user);
       } else {
@@ -91,7 +93,7 @@ export const AuthProvider = ({ children }) => {
       console.error('[AuthContext] Login connection error:', err);
       return { 
         success: false, 
-        error: 'Unable to connect to the API server. If running locally, check port 5000. If Render, please wait 30 seconds for wake-up.' 
+        error: 'Unable to connect to server. If the server was sleeping, please wait 30 seconds and try again.' 
       };
     }
   };
@@ -124,7 +126,7 @@ export const AuthProvider = ({ children }) => {
       console.error('[AuthContext] Registration connection error:', err);
       return { 
         success: false, 
-        error: 'Unable to connect to the API server. If running locally, check port 5000. If Render, please wait 30 seconds for wake-up.' 
+        error: 'Unable to connect to server. If the server was sleeping, please wait 30 seconds and try again.' 
       };
     }
   };
