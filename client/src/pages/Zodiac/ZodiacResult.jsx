@@ -62,9 +62,7 @@ export default function ZodiacResult() {
     setCookie('zodiac_trait', currentTrait, 30);
   }, [navigate]);
 
-  if (!sign) {
-    return null;
-  }
+  if (!sign) return null;
 
   return (
     <div className={styles.pageWrapper}>

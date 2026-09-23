@@ -57,6 +57,7 @@ export const deleteUserProfile = async (req, res, next) => {
   }
 };
 
+
 // GET /api/user/outfits
 export const getUserOutfits = async (req, res, next) => {
   try {
@@ -70,12 +71,37 @@ export const getUserOutfits = async (req, res, next) => {
 // POST /api/undertone/save
 export const saveUndertone = async (req, res, next) => {
   try {
-    const { undertone, zodiac, season } = req.body;
+    const { 
+      undertone, 
+      zodiac, 
+      zodiac_sign, 
+      season, 
+      name, 
+      birthdate, 
+      gender,
+      user_id 
+    } = req.body;
+
+    const targetUserId = req.user?._id || user_id;
+    if (!targetUserId) {
+      return res.status(400).json({ success: false, message: 'User ID is required.' });
+    }
+
+    const updateFields = {
+      ...(undertone && { undertone }),
+      ...((zodiac || zodiac_sign) && { zodiac_sign: zodiac || zodiac_sign }),
+      ...(season && { season }),
+      ...(name && { name }),
+      ...(birthdate && { birthdate }),
+      ...(gender && { gender })
+    };
+
     const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      { undertone, zodiac_sign: zodiac, season },
+      targetUserId,
+      updateFields,
       { new: true }
     );
+
     res.status(200).json({ success: true, user: updatedUser });
   } catch (err) {
     next(err);
@@ -220,3 +246,4 @@ export const resetUserPassword = async (req, res, next) => {
     next(err);
   }
 };
+

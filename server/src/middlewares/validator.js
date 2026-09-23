@@ -19,9 +19,12 @@ export const registerSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
   role: Joi.string().valid('user', 'admin').default('user'),
+  name: Joi.string().allow('', null),
+  birthdate: Joi.string().allow('', null),
   gender: Joi.string().allow('', null),
   zodiac_sign: Joi.string().allow('', null),
-  undertone: Joi.string().allow('', null)
+  undertone: Joi.string().allow('', null),
+  season: Joi.string().allow('', null)
 });
 
 export const loginSchema = Joi.object({

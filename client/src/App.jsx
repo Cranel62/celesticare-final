@@ -8,6 +8,8 @@ import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Zodiac from './pages/Zodiac/Zodiac';
 import ZodiacResult from './pages/Zodiac/ZodiacResult';
+import UnderTone from './pages/UnderTone/UnderTone';
+import UndertoneResult from './pages/UnderTone/UndertoneResult';
 import Forecast from './pages/Forecast/Forecast';
 import GetToKnow from './pages/GetToKnow/GetToKnow';
 import AdminUsers from './pages/Admin/AdminUsers';
@@ -25,6 +27,11 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/zodiac" element={<Zodiac />} />
           <Route path="/zodiac/zodiac-result" element={<ZodiacResult />} />
+          
+          {/* Undertone routes */}
+          <Route path="/undertone/test" element={<UnderTone />} />
+          <Route path="/undertone/result" element={<UndertoneResult />} />
+
           <Route path="/forecast" element={<Forecast />} />
           <Route path="/get-to-know" element={<GetToKnow />} />
           

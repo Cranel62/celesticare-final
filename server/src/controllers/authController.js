@@ -14,7 +14,18 @@ const signToken = (id, role) => {
 // POST /api/auth/register
 export const register = async (req, res, next) => {
   try {
-    const { username, email, password } = req.body;
+    const { 
+      username, 
+      email, 
+      password, 
+      name, 
+      birthdate, 
+      gender, 
+      zodiac_sign, 
+      undertone, 
+      season 
+    } = req.body;
+
     const trimmedEmail = email.toLowerCase().trim();
     const isAdmin = trimmedEmail.endsWith(ADMIN_EMAIL_DOMAIN);
 
@@ -38,7 +49,13 @@ export const register = async (req, res, next) => {
       email: trimmedEmail,
       password,
       role: isAdmin ? 'admin' : 'user',
-      is_admin: isAdmin
+      is_admin: isAdmin,
+      ...(name && { name }),
+      ...(birthdate && { birthdate }),
+      ...(gender && { gender }),
+      ...(zodiac_sign && { zodiac_sign }),
+      ...(undertone && { undertone }),
+      ...(season && { season })
     });
 
     const token = signToken(newUser._id, newUser.role);
@@ -51,7 +68,11 @@ export const register = async (req, res, next) => {
         username: newUser.username,
         email: newUser.email,
         role: newUser.role,
-        is_admin: newUser.is_admin
+        is_admin: newUser.is_admin,
+        zodiac_sign: newUser.zodiac_sign,
+        undertone: newUser.undertone,
+        season: newUser.season,
+        name: newUser.name
       }
     });
   } catch (err) {
