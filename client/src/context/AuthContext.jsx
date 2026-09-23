@@ -16,7 +16,7 @@ const getApiBase = () => {
     ? '/api' 
     : 'https://celesticare-api.onrender.com/api';
 };
-*/
+
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
