@@ -2,12 +2,9 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 const AuthContext = createContext();
 
-//const API_BASE = import.meta.env.PROD ? '/api' : (import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api').replace(/\/$/, '');
-
 // 1. If VITE_API_BASE_URL is set (in .env or .env.local), use it.
 // 2. In production on Vercel, use same-origin '/api' (proxied via vercel.json to Render).
 // 3. Otherwise, fallback directly to the live Render backend.
-
 const getApiBase = () => {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
@@ -17,6 +14,7 @@ const getApiBase = () => {
     : 'https://celesticare-api.onrender.com/api';
 };
 
+const API_BASE = getApiBase();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -48,7 +46,7 @@ export const AuthProvider = ({ children }) => {
           'Content-Type': 'application/json'
         }
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (res.ok && data.user) {
         setUser(data.user);
       } else {
