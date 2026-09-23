@@ -36,34 +36,41 @@ export default function Navbar() {
           <span className={styles.navbarTogglerIcon}></span>
         </button>
 
-        <div className={`${styles.navbarCollapse} ${isOpen ? styles.show : ''}`}>
-          <ul className={styles.navbarNav}>
+        <div className={`navbar-collapse justify-content-end ${styles.navbarCollapse} ${isOpen ? styles.show : ''}`}>
+          <ul className={`navbar-nav ${styles.navbarNav}`}>
             {isAuthenticated ? (
               <>
                 {/* Visible ONLY to Administrators */}
                 {isAdmin && (
-                  <li className={styles.navItem}>
-                    <Link to="/admin/users" className={styles.navLink} onClick={closeMenu} style={{ color: '#ffc107', fontWeight: '600' }}>
+                  <li className={`nav-item ${styles.navItem}`}>
+                    <Link 
+                      to="/admin/users" 
+                      className={`nav-link ${styles.navLink}`} 
+                      onClick={closeMenu} 
+                      style={{ color: '#ffc107', fontWeight: '600' }}
+                    >
                       <i className={`fas fa-shield-alt ${styles.navFaIcon}`} style={{ color: '#ffc107' }}></i>
                       <span>Admin Panel</span>
                     </Link>
                   </li>
                 )}
 
-                <li className={styles.navItem}>
-                  <Link to="/dashboard" className={styles.navLink} onClick={closeMenu}>
+                <li className={`nav-item ${styles.navItem}`}>
+                  <Link to="/dashboard" className={`nav-link ${styles.navLink}`} onClick={closeMenu}>
                     <i className={`fas fa-th-large ${styles.navFaIcon}`}></i>
                     <span>User Dashboard</span>
                   </Link>
                 </li>
-                <li className={styles.navItem}>
-                  <Link to="/zodiac" className={styles.navLink} onClick={closeMenu}>
+
+                <li className={`nav-item ${styles.navItem}`}>
+                  <Link to="/zodiac" className={`nav-link ${styles.navLink}`} onClick={closeMenu}>
                     <i className={`fas fa-star-and-crescent ${styles.navFaIcon}`}></i>
                     <span>AstroView</span>
                   </Link>
                 </li>
-                <li className={styles.navItem}>
-                  <Link to="/forecast" className={styles.navLink} onClick={closeMenu}>
+
+                <li className={`nav-item ${styles.navItem}`}>
+                  <Link to="/forecast" className={`nav-link ${styles.navLink}`} onClick={closeMenu}>
                     <div className={styles.mysticIcon}>
                       <div className={styles.spiritBall}></div>
                       <div className={`${styles.tarotCard} ${styles.cardTop}`}></div>
@@ -74,11 +81,12 @@ export default function Navbar() {
                     <span>Mystic Arcana</span>
                   </Link>
                 </li>
-                <li className={styles.navItem}>
+
+                <li className={`nav-item ${styles.navItem}`}>
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className={`${styles.navLink} ${styles.textDanger}`}
+                    className={`nav-link ${styles.navLink} ${styles.textDanger}`}
                     style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}
                   >
                     <i className={`fas fa-sign-out-alt ${styles.navFaIcon}`}></i>
@@ -88,14 +96,14 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <li className={styles.navItem}>
-                  <Link to="/" className={styles.navLink} onClick={closeMenu}>
+                <li className={`nav-item ${styles.navItem}`}>
+                  <Link to="/" className={`nav-link ${styles.navLink}`} onClick={closeMenu}>
                     <i className={`fas fa-home ${styles.navFaIcon}`}></i>
                     <span>Home</span>
                   </Link>
                 </li>
-                <li className={styles.navItem}>
-                  <Link to="/login" className={styles.navLink} onClick={closeMenu}>
+                <li className={`nav-item ${styles.navItem}`}>
+                  <Link to="/login" className={`nav-link ${styles.navLink}`} onClick={closeMenu}>
                     <i className={`fas fa-user-plus ${styles.navFaIcon}`}></i>
                     <span>Login</span>
                   </Link>

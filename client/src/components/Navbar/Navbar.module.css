@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Base container */
 .navbar {
   background: #ffffff !important;
   padding: 15px 60px !important;
@@ -11,9 +13,12 @@
   width: 100% !important;
   z-index: 1030 !important;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
   display: flex !important;
   align-items: center !important;
 }
+
+/* Brand */
 .navbarBrand {
   font-weight: 700 !important;
   font-family: 'Libre Baskerville', 'Georgia', serif !important;
@@ -28,6 +33,7 @@
   text-decoration: none !important;
   white-space: nowrap !important;
 }
+
 .customCImage {
   display: inline-block !important;
   width: 58px !important;
@@ -40,12 +46,19 @@
   background-position: center;
   background-size: contain;
 }
+
 .brandText {
   display: inline-flex !important;
   align-items: center !important;
   line-height: 1 !important;
   color: #984eb5 !important;
 }
+
+.restOfText {
+  margin-left: -3px !important;
+}
+
+/* Links & Nav Items */
 .navbarNav {
   display: flex !important;
   align-items: center !important;
@@ -53,10 +66,12 @@
   margin: 0 !important;
   padding: 0 !important;
 }
+
 .navItem {
   display: flex !important;
   align-items: center !important;
 }
+
 .navLink {
   color: #333 !important;
   font-weight: 500 !important;
@@ -70,8 +85,24 @@
   text-decoration: none !important;
   cursor: pointer !important;
 }
-.navLink:hover { color: #000 !important; }
-.textDanger { color: #d9534f !important; }
+
+.navLink:hover {
+  color: #000 !important;
+  text-decoration: none !important;
+}
+
+.textDanger {
+  color: #d9534f !important;
+}
+
+.logoutBtn {
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  font-family: inherit !important;
+}
+
+/* Mobile Toggler */
 .navbarToggler {
   border: none !important;
   padding: 4px 8px !important;
@@ -79,6 +110,7 @@
   outline: none !important;
   cursor: pointer;
 }
+
 .navbarTogglerIcon {
   display: inline-block;
   width: 1.5em;
@@ -88,18 +120,222 @@
   background-position: center;
   background-size: 100%;
 }
-.navFaIcon { font-size: 1.2rem !important; margin-bottom: 4px !important; }
-.mysticIcon { position: relative; width: 28px; height: 28px; margin-bottom: 4px; display: flex; justify-content: center; align-items: center; }
-.spiritBall { position: absolute; width: 22px; height: 22px; background: radial-gradient(circle at 35% 35%, #a88beb, #7c5ac2); border-radius: 50%; }
-.tarotCard { position: absolute; width: 12px; height: 16px; border-radius: 2px; }
-.cardTop { background: #ffb6c1; top: -4px; right: 2px; }
-.cardRight { background: #b0e0e6; bottom: 0; right: -6px; }
-.cardBottom { background: #c1e1c1; bottom: -6px; left: 4px; }
-.cardLeft { background: #fdd0f2; top: 2px; left: -6px; }
+
+/* Standard Icons */
+.navIcon {
+  width: 24px !important;
+  height: 24px !important;
+  margin-bottom: 4px !important;
+  transition: transform 0.3s ease !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+.navFaIcon {
+  font-size: 1.2rem !important;
+  margin-bottom: 4px !important;
+  transition: transform 0.3s ease !important;
+  display: block !important;
+}
+
+.navLink:hover .navIcon,
+.navLink:hover .navFaIcon {
+  transform: translateY(-2px) !important;
+}
+
+/* Mystic Arcana Custom Icon */
+.mysticIcon {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spiritBall {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: radial-gradient(circle at 35% 35%, #a88beb, #7c5ac2);
+  border-radius: 50%;
+  box-shadow: 0 3px 6px rgba(124, 90, 194, 0.3), inset -2px -2px 4px rgba(0,0,0,0.1), inset 2px 2px 4px rgba(255,255,255,0.5);
+  border: 1px solid #9b7bda;
+  z-index: 2;
+}
+
+.spiritBall::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+}
+
+.tarotCard {
+  position: absolute;
+  width: 12px;
+  height: 16px;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(255, 154, 172, 0.3);
+  z-index: 1;
+}
+
+.tarotCard::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border-radius: 1px;
+}
+
+.tarotCard::after {
+  content: '★';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 6px;
+}
+
+.cardTop {
+  background: #ffb6c1;
+  border: 1px solid #ff9aac;
+  top: -4px;
+  right: 2px;
+  --rot: 10deg;
+  animation: floatCard 3s ease-in-out infinite;
+}
+.cardTop::before { border: 1px solid #ffd9e0; }
+.cardTop::after { color: #ffd9e0; }
+
+.cardRight {
+  background: #b0e0e6;
+  border: 1px solid #7fcdd9;
+  bottom: 0px;
+  right: -6px;
+  --rot: 75deg;
+  animation: floatCard 3s ease-in-out infinite 0.2s;
+}
+.cardRight::before { border: 1px solid #c9ecf1; }
+.cardRight::after { color: #e0f0f5; }
+
+.cardBottom {
+  background: #c1e1c1;
+  border: 1px solid #9fc99f;
+  bottom: -6px;
+  left: 4px;
+  --rot: -10deg;
+  animation: floatCard 3s ease-in-out infinite 0.4s;
+}
+.cardBottom::before { border: 1px solid #d4ecd4; }
+.cardBottom::after { color: #e0f0e0; }
+
+.cardLeft {
+  background: #fdd0f2;
+  border: 1px solid #fba9e7;
+  top: 2px;
+  left: -6px;
+  --rot: -65deg;
+  animation: floatCard 3s ease-in-out infinite 0.6s;
+}
+.cardLeft::before { border: 1px solid #fde4f7; }
+.cardLeft::after { color: #ffe0f7; }
+
+@keyframes floatCard {
+  0%, 100% {
+    transform: translateY(0) rotate(var(--rot, 0deg));
+  }
+  50% {
+    transform: translateY(-3px) rotate(var(--rot, 0deg));
+  }
+}
+
+.navLink:hover .spiritBall {
+  background: radial-gradient(circle at 35% 35%, #b69cf0, #8e6ad6);
+  box-shadow: 0 0 15px rgba(124, 90, 194, 0.5);
+}
+
+.navLink:hover .tarotCard {
+  filter: brightness(1.05);
+  transform: translateY(-1px) rotate(var(--rot, 0deg));
+}
+
+/* Responsive Styles */
 @media (max-width: 991.98px) {
-  .navbar { padding: 15px 20px !important; min-height: 70px !important; }
-  .navbarCollapse { display: none; background: #ffffff !important; position: absolute !important; top: 100% !important; left: 0; right: 0; padding: 10px !important; }
-  .navbarCollapse.show { display: block !important; }
-  .navbarNav { flex-direction: column !important; }
-  .navLink { flex-direction: row !important; }
+  .navbar {
+    padding: 15px 20px !important;
+    min-height: 70px !important;
+  }
+
+  .navbarCollapse {
+    display: none;
+    background: #ffffff !important;
+    margin-top: 15px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    padding: 10px !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+  }
+
+  .navbarCollapse.show {
+    display: block !important;
+  }
+
+  .navbarNav {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .navLink {
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    padding: 12px 15px !important;
+    border-bottom: 1px solid #f5f5f5 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  .navIcon,
+  .navFaIcon,
+  .mysticIcon {
+    margin-bottom: 0 !important;
+    margin-right: 12px !important;
+  }
+
+  .navbarBrand {
+    font-size: 1.8rem !important;
+    height: 50px !important;
+    padding: 5px 10px !important;
+  }
+
+  .customCImage {
+    width: 35px !important;
+    height: 35px !important;
+    min-width: 35px !important;
+    margin-right: 0 !important;
+    transform: translateY(-1px) !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .customCImage {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+  }
+
+  .navbarBrand {
+    font-size: 1.5rem !important;
+  }
 }
