@@ -3,9 +3,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Login.module.css';
 
+function clearGuestSession() {
+  const keys = [
+    'name', 'birthdate', 'gender', 'zodiac_sign', 
+    'temp_zodiac', 'undertone', 'temp_undertone', 
+    'season', 'temp_season', 'zodiac_trait'
+  ];
+  keys.forEach((key) => {
+    sessionStorage.removeItem(key);
+    document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  });
+}
+
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, fetchUserProfile } = useAuth();
   
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
@@ -25,17 +37,25 @@ export default function Login() {
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
-        // If administrator, route straight to the admin management dashboard
+        // Discard any leftover guest quiz data to prevent overwriting saved user data
+        clearGuestSession();
+
+        // Refresh existing profile directly from database
+        if (fetchUserProfile) {
+          await fetchUserProfile();
+        }
+
+        // Dedicated Role Routing
         if (result.user?.is_admin || result.user?.role === 'admin') {
-          navigate('/admin/users');
+          navigate('/admin/users', { replace: true });
         } else {
-          navigate('/dashboard');
+          navigate('/dashboard', { replace: true });
         }
       } else {
         setErrorMessage(result.error || 'Invalid email or password.');
       }
     } catch (err) {
-      setErrorMessage('Unable to connect to Render server. Please wait a moment and try again.');
+      setErrorMessage('Unable to connect to server. Please wait a moment and try again.');
     } finally {
       setLoading(false);
     }
@@ -86,7 +106,7 @@ export default function Login() {
           </div>
 
           <button type="submit" className={styles.btnLogin} disabled={loading}>
-            {loading ? 'Connecting to Render...' : 'Login'}
+            {loading ? 'Connecting...' : 'Login'}
           </button>
         </form>
 

@@ -47,10 +47,18 @@ export default function Dashboard() {
   const [editForm, setEditForm] = useState({ name: '', gender: '', birthdate: '', zodiac_sign: '' });
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate('/login');
-      return;
+    if (!loading) {
+      if (!isAuthenticated) {
+        navigate('/login', { replace: true });
+        return;
+      }
+      // DEDICATED SEPARATION: Admins must use the Admin Dashboard, not the user page
+      if (user?.is_admin || user?.role === 'admin') {
+        navigate('/admin/users', { replace: true });
+        return;
+      }
     }
+
     if (user) {
       setEditForm({
         name: user.name || '',
@@ -87,6 +95,9 @@ export default function Dashboard() {
   };
 
   if (loading || !user) return null;
+
+  // Don't render user dashboard for admin users (prevents brief flash before redirect)
+  if (user.is_admin || user.role === 'admin') return null;
 
   const currentZodiac = user.zodiac_sign || calculateZodiacSign(user.birthdate) || 'Aries';
   const zodiacData = ZODIAC_DETAILS[currentZodiac] || ZODIAC_DETAILS.Aries;
