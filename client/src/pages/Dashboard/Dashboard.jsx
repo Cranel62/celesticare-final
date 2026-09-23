@@ -59,7 +59,7 @@ export default function Dashboard() {
         zodiac_sign: user.zodiac_sign || ''
       });
     }
-  }, [loading, isAuthenticated, user]);
+  }, [loading, isAuthenticated, user, navigate]);
 
   const handleBirthdateChange = (e) => {
     const bdate = e.target.value;
@@ -120,6 +120,8 @@ export default function Dashboard() {
                 <div className={styles.profileItem}><span className={styles.profileLabel}>Gender:</span> {user.gender || 'Not set'}</div>
                 <div className={styles.profileItem}><span className={styles.profileLabel}>Birthdate:</span> {user.birthdate || 'Not set'}</div>
                 <div className={styles.profileItem}><span className={styles.profileLabel}>Zodiac:</span> {currentZodiac}</div>
+                <div className={styles.profileItem}><span className={styles.profileLabel}>Undertone:</span> {user.undertone ? user.undertone.toUpperCase() : 'Not set'}</div>
+                <div className={styles.profileItem}><span className={styles.profileLabel}>Season:</span> {user.season || 'Not set'}</div>
               </div>
             </div>
 

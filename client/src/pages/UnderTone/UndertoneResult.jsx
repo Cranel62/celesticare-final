@@ -88,12 +88,23 @@ function getCookie(name) {
   return match ? decodeURIComponent(match[2]) : null;
 }
 
-const API_BASE = window.location.port === '5173' ? 'http://localhost:5000' : '';
+function clearGuestCookies() {
+  const cookies = ['name', 'birthdate', 'gender', 'zodiac_sign', 'temp_zodiac', 'undertone', 'temp_undertone', 'season', 'temp_season', 'zodiac_trait'];
+  cookies.forEach((c) => {
+    document.cookie = `${c}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  });
+}
 
-export default function UndertoneResult({ onLoginSuccess }) {
+function clearGuestSession() {
+  const keys = ['name', 'birthdate', 'gender', 'zodiac_sign', 'temp_zodiac', 'undertone', 'temp_undertone', 'season', 'temp_season', 'zodiac_trait'];
+  keys.forEach((k) => sessionStorage.removeItem(k));
+  clearGuestCookies();
+}
+
+export default function UndertoneResult() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, token, loginUser, updateUserProfileData } = useAuth();
+  const { user, login, register, fetchUserProfile } = useAuth();
 
   const [zodiac, setZodiac] = useState('');
   const [undertone, setUndertone] = useState('');
@@ -103,6 +114,7 @@ export default function UndertoneResult({ onLoginSuccess }) {
   const [activeModal, setActiveModal] = useState(null);
   const [modalMessage, setModalMessage] = useState('');
   const [modalError, setModalError] = useState('');
+  const [modalLoading, setModalLoading] = useState(false);
 
   // Form states
   const [loginEmail, setLoginEmail] = useState('');
@@ -127,18 +139,21 @@ export default function UndertoneResult({ onLoginSuccess }) {
       sessionStorage.getItem('temp_zodiac') ||
       getCookie('temp_zodiac') ||
       sessionStorage.getItem('zodiac_sign') ||
-      getCookie('zodiac_sign');
+      getCookie('zodiac_sign') ||
+      user?.zodiac_sign;
 
     const storedUndertone =
       sessionStorage.getItem('temp_undertone') ||
       getCookie('temp_undertone') ||
       sessionStorage.getItem('undertone') ||
-      getCookie('undertone');
+      getCookie('undertone') ||
+      user?.undertone;
 
     const storedSeason =
       sessionStorage.getItem('temp_season') ||
       getCookie('temp_season') ||
-      sessionStorage.getItem('season');
+      sessionStorage.getItem('season') ||
+      user?.season;
 
     if (!storedZodiac || !storedUndertone) {
       navigate(`/undertone/test${isMobile ? '?mobile=1' : ''}`);
@@ -148,7 +163,7 @@ export default function UndertoneResult({ onLoginSuccess }) {
     setZodiac(storedZodiac);
     setUndertone(storedUndertone.toLowerCase());
     setSeason(storedSeason || '');
-  }, [navigate, isMobile]);
+  }, [navigate, isMobile, user]);
 
   const handleMouseEnter = () => {
     lastTimeRef.current = 0;
@@ -174,74 +189,36 @@ export default function UndertoneResult({ onLoginSuccess }) {
     }
   };
 
-  const syncGuestDataToUser = async (userId, customToken) => {
-    const guestPayload = {
-      user_id: userId,
-      name: sessionStorage.getItem('name') || getCookie('name') || '',
-      birthdate: sessionStorage.getItem('birthdate') || getCookie('birthdate') || '',
-      gender: sessionStorage.getItem('gender') || getCookie('gender') || '',
-      zodiac_sign: zodiac,
-      undertone,
-      season
-    };
-
-    const authToken = customToken || token || localStorage.getItem('token');
-
-    try {
-      await fetch(`${API_BASE}/api/undertone/save`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          ...(authToken && { Authorization: `Bearer ${authToken}` })
-        },
-        credentials: 'include',
-        body: JSON.stringify(guestPayload)
-      });
-
-      if (updateUserProfileData) {
-        updateUserProfileData(guestPayload);
-      }
-    } catch (err) {
-      console.error('Failed to sync guest session to user profile:', err);
-    }
-  };
-
+  // 1. LOGGING IN TO EXISTING ACCOUNT:
+  // Discard the guest questionnaire session completely so existing profile is NOT overwritten
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setModalError('');
-    try {
-      const response = await fetch(`${API_BASE}/api/auth/login`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        const targetUser = data.user;
-        const userId = targetUser?.id || targetUser?.sql_id;
-        
-        if (userId) {
-          await syncGuestDataToUser(userId, data.token);
-        }
+    setModalLoading(true);
 
-        if (loginUser) loginUser(targetUser, data.token);
-        if (onLoginSuccess) onLoginSuccess(targetUser);
-        
+    try {
+      const res = await login(loginEmail, loginPassword);
+      if (res.success) {
+        // Discard all guest quiz entries
+        clearGuestSession();
+
+        // Refresh user profile from database
+        await fetchUserProfile();
+
         setActiveModal(null);
         navigate(`/dashboard${isMobile ? '?mobile=1' : ''}`);
       } else {
-        setModalError(data.message || data.error || 'Invalid credentials');
+        setModalError(res.error || 'Invalid email or password.');
       }
     } catch {
-      setModalError('Network error. Please try again.');
+      setModalError('Connection error. Please try again.');
+    } finally {
+      setModalLoading(false);
     }
   };
 
+  // 2. SIGNING UP FOR NEW ACCOUNT:
+  // Save all collected answers into the new user profile in MongoDB
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setModalError('');
@@ -254,6 +231,8 @@ export default function UndertoneResult({ onLoginSuccess }) {
       setModalError('Password must be at least 8 characters with 1 uppercase letter and no spaces!');
       return;
     }
+
+    setModalLoading(true);
 
     const registerPayload = {
       email: regEmail,
@@ -268,39 +247,20 @@ export default function UndertoneResult({ onLoginSuccess }) {
     };
 
     try {
-      const response = await fetch(`${API_BASE}/api/auth/register`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify(registerPayload),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
+      const res = await register(registerPayload);
+      if (res.success) {
         setModalMessage('Account created! Entering your dashboard...');
-        const targetUser = data.user;
-        const userId = targetUser?.id || targetUser?.sql_id;
-
-        if (userId) {
-          await syncGuestDataToUser(userId, data.token);
-        }
-
-        if (loginUser) loginUser(targetUser, data.token);
-        if (onLoginSuccess) onLoginSuccess(targetUser);
-
+        clearGuestSession();
+        await fetchUserProfile();
         setActiveModal(null);
-        setTimeout(() => {
-          navigate(`/dashboard${isMobile ? '?mobile=1' : ''}`);
-        }, 500);
+        navigate(`/dashboard${isMobile ? '?mobile=1' : ''}`);
       } else {
-        setModalError(data.message || data.error || 'Registration failed');
+        setModalError(res.error || 'Registration failed.');
       }
     } catch {
-      setModalError('Network error. Please try again.');
+      setModalError('Connection error. Please try again.');
+    } finally {
+      setModalLoading(false);
     }
   };
 
@@ -366,9 +326,8 @@ export default function UndertoneResult({ onLoginSuccess }) {
             <button
               type="button"
               className={styles.btnContinue}
-              onClick={async () => {
-                const userId = user.id || user.sql_id;
-                if (userId) await syncGuestDataToUser(userId);
+              onClick={() => {
+                clearGuestSession();
                 navigate(`/dashboard${isMobile ? '?mobile=1' : ''}`);
               }}
             >
@@ -402,7 +361,7 @@ export default function UndertoneResult({ onLoginSuccess }) {
               &times;
             </button>
             <div className={styles.brandTitle}>CELESTICARE</div>
-            <h2>Log in to save your color analysis</h2>
+            <h2>Log in to your account</h2>
 
             {modalError && <div className={styles.alertDanger}>{modalError}</div>}
             {modalMessage && <div className={styles.alertSuccess}>{modalMessage}</div>}
@@ -435,8 +394,13 @@ export default function UndertoneResult({ onLoginSuccess }) {
                 </button>
               </div>
 
-              <button type="submit" className={styles.btnLoginSubmit} style={{ width: '100%' }}>
-                Login
+              <button 
+                type="submit" 
+                className={styles.btnLoginSubmit} 
+                style={{ width: '100%' }}
+                disabled={modalLoading}
+              >
+                {modalLoading ? 'Logging in...' : 'Login'}
               </button>
 
               <p className={styles.textMuted}>
@@ -513,8 +477,13 @@ export default function UndertoneResult({ onLoginSuccess }) {
                 required
               />
 
-              <button type="submit" className={styles.btnLoginSubmit} style={{ width: '100%' }}>
-                Sign Up
+              <button 
+                type="submit" 
+                className={styles.btnLoginSubmit} 
+                style={{ width: '100%' }}
+                disabled={modalLoading}
+              >
+                {modalLoading ? 'Creating account...' : 'Sign Up'}
               </button>
 
               <p className={styles.textMuted}>
