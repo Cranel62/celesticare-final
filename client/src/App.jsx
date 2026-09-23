@@ -27,8 +27,8 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/zodiac" element={<Zodiac />} />
           <Route path="/zodiac/zodiac-result" element={<ZodiacResult />} />
-          
-          {/* Undertone routes */}
+
+          {/* Undertone Assessment & Result Routes */}
           <Route path="/undertone/test" element={<UnderTone />} />
           <Route path="/undertone/result" element={<UndertoneResult />} />
 
