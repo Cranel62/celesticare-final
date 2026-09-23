@@ -4,9 +4,7 @@ const AuthContext = createContext();
 
 // In production on Vercel, use same-origin '/api' (proxied via vercel.json to Render)
 // In local dev without proxy, talk directly to the live Render backend
-const API_BASE = import.meta.env.PROD 
-  ? '/api' 
-  : 'https://celesticare-api.onrender.com/api';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api').replace(/\/$/, '');
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
