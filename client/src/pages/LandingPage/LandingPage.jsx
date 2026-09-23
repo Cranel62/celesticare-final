@@ -1,10 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import './LandingPage.css';
 
-// Media assets
+// ==========================================
+// IMPORT YOUR LOCAL MEDIA ASSETS HERE:
+// ==========================================
+// Place 'zodiac_circle.png' inside 'src/assets/images/'
 import zodiacCircleImg from '../../assets/images/zodiac_circle.png';
-import backgroundMusicAudio from '../../assets/audio/Astral.mp3';
+
+// Place 'Astral.mp3' inside 'src/assets/audio/'
+// import backgroundMusicAudio from '../../assets/audio/Astral.mp3';
+const backgroundMusicAudio = "";
 
 const zodiacSigns = [
   { symbol: '♈', name: 'Aries', desc: 'Bold & Dynamic - Confident, energetic styles with fiery accents' },
@@ -50,18 +55,19 @@ export default function LandingPage() {
     }
 
     rafId = requestAnimationFrame(step);
+
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
 
-  // 2. Starfield & Shooting Stars
+  // 2. Starfield & Shooting Stars Animations
   useEffect(() => {
     const starfield = starfieldRef.current;
     if (!starfield) return;
 
     const stars = [];
-    const starCount = 180;
+    const starCount = 200;
 
     for (let i = 0; i < starCount; i++) {
       const star = document.createElement('div');
@@ -83,20 +89,21 @@ export default function LandingPage() {
       stars.push({
         element: star,
         baseOpacity,
-        speed: Math.random() * 0.5 + 0.1,
+        speed: Math.random() * 0.5 + 0.1
       });
     }
 
     let starRafId = null;
     function animateStars() {
-      stars.forEach((star) => {
-        const opacity = star.baseOpacity * (0.7 + 0.3 * Math.sin((Date.now() * star.speed) / 1000));
+      stars.forEach(star => {
+        const opacity = star.baseOpacity * (0.7 + 0.3 * Math.sin(Date.now() * star.speed / 1000));
         star.element.style.opacity = opacity;
       });
       starRafId = requestAnimationFrame(animateStars);
     }
     starRafId = requestAnimationFrame(animateStars);
 
+    // Shooting stars
     let shootingTimeoutId = null;
     function createShootingStar() {
       if (!starfieldRef.current) return;
@@ -110,8 +117,8 @@ export default function LandingPage() {
       const distance = Math.random() * 150 + 250;
 
       shootingStar.style.animation = `shootStar ${duration}ms linear forwards`;
-      shootingStar.style.setProperty('--translateX', `${distance * Math.cos((angle * Math.PI) / 180)}px`);
-      shootingStar.style.setProperty('--translateY', `${distance * Math.sin((angle * Math.PI) / 180)}px`);
+      shootingStar.style.setProperty('--translateX', `${distance * Math.cos(angle * Math.PI / 180)}px`);
+      shootingStar.style.setProperty('--translateY', `${distance * Math.sin(angle * Math.PI / 180)}px`);
 
       starfieldRef.current.appendChild(shootingStar);
 
@@ -173,17 +180,19 @@ export default function LandingPage() {
 
   return (
     <div className="landing-page-wrapper">
+      {/* Background Audio */}
       <audio ref={audioRef} loop src={backgroundMusicAudio} />
 
-      <button
-        type="button"
+      {/* Floating Music Control */}
+      <div 
         className={`music-control ${isMuted || !isPlaying ? 'muted' : ''}`}
         onClick={toggleMusic}
         title="Toggle Audio"
       >
         {!isPlaying ? '▶️' : isMuted ? '🔇' : '🔈'}
-      </button>
+      </div>
 
+      {/* Dynamic Starfield */}
       <div className="starfield" ref={starfieldRef}></div>
 
       <div className="content-container">
@@ -195,7 +204,7 @@ export default function LandingPage() {
               The stylist of the stars, CelestiCare, gives you the latest fashion tips by using your zodiac sign
               and matching it to your preferred style preferences and aesthetics.
             </p>
-            <Link to="/get-to-know" className="hero-btn">Get Started</Link>
+            <a href="/get-to-know" className="hero-btn">Get Started</a>
           </div>
 
           <div className="hero-image">
@@ -209,7 +218,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Intro */}
+        {/* New Features Intro */}
         <div className="new-features-intro">
           <div className="container">
             <h3>⟡˙⋆ Introducing Deeper Cosmic Insights ⋆˙⟡</h3>
@@ -217,7 +226,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Mystic Features */}
+        {/* Mystic Features Section */}
         <section className="features-section">
           <div className="container">
             <h2 className="section-title">Discover Our New Mystic Features</h2>
@@ -273,7 +282,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* How It Works */}
+        {/* How It Works Section */}
         <section className="features-section" style={{ background: 'rgba(0, 0, 0, 0.1)' }}>
           <div className="container">
             <h2 className="section-title">How CelestiCare Works</h2>
@@ -331,13 +340,13 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* CTA */}
+        {/* CTA Section */}
         <section className="cta-section">
           <div className="container">
             <div className="cta-content">
               <h2>Ready to Transform Your Style?</h2>
               <p>Join thousands of fashion-forward individuals who use astrology to enhance their personal style and discover deeper cosmic insights.</p>
-              <Link to="/register" className="cta-btn">Sign In to Your Account</Link>
+              <a href="/register" className="cta-btn">Sign In to Your Account</a>
             </div>
           </div>
         </section>
@@ -352,20 +361,20 @@ export default function LandingPage() {
                   Where astrology meets fashion. Discover your unique style through the wisdom of the stars and express your true cosmic self.
                 </p>
                 <div className="social-links">
-                  <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" title="Facebook"><i className="fab fa-facebook-f"></i></a>
-                  <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" title="Instagram"><i className="fab fa-instagram"></i></a>
-                  <a href="https://x.com/" target="_blank" rel="noreferrer" title="Twitter"><i className="fab fa-twitter"></i></a>
-                  <a href="https://ph.pinterest.com/" target="_blank" rel="noreferrer" title="Pinterest"><i className="fab fa-pinterest"></i></a>
+                  <a href="https://www.facebook.com/" title="Facebook"><i className="fab fa-facebook-f"></i></a>
+                  <a href="https://www.instagram.com/" title="Instagram"><i className="fab fa-instagram"></i></a>
+                  <a href="https://x.com/" title="Twitter"><i className="fab fa-twitter"></i></a>
+                  <a href="https://ph.pinterest.com/" title="Pinterest"><i className="fab fa-pinterest"></i></a>
                 </div>
               </div>
 
               <div className="col-lg-3 col-md-4 mb-4">
                 <div className="footer-links">
                   <h5>Quick Links</h5>
-                  <Link to="/">Home</Link>
-                  <Link to="/zodiac">Zodiacs</Link>
-                  <Link to="/forecast">Arcana</Link>
-                  <Link to="/about">About Us</Link>
+                  <a href="/">Home</a>
+                  <a href="/zodiac">Zodiacs</a>
+                  <a href="/forecast">Arcana</a>
+                  <a href="/about">About Us</a>
                 </div>
               </div>
 
@@ -375,7 +384,7 @@ export default function LandingPage() {
                   <p className="footer-description" style={{ marginBottom: '1rem' }}>Get daily fashion tips based on your zodiac sign.</p>
                   <div className="input-group mb-3">
                     <input type="email" className="form-control subscribe-input" placeholder="Your email address" />
-                    <button className="btn subscribe-btn" type="button">Subscribe</button>
+                    <button className="btn subscribe-btn">Subscribe</button>
                   </div>
                 </div>
               </div>
@@ -387,8 +396,8 @@ export default function LandingPage() {
                   <p className="mb-0">&copy; 2026 CelestiCare. All rights reserved.</p>
                 </div>
                 <div className="col-md-6 text-md-end">
-                  <Link to="/privacy" className="me-3">Privacy Policy</Link>
-                  <Link to="/terms">Terms of Service</Link>
+                  <a href="/privacy" className="me-3">Privacy Policy</a>
+                  <a href="/terms">Terms of Service</a>
                 </div>
               </div>
             </div>
