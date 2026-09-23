@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './AdminUsers.module.css';
 
-const API_BASE = import.meta.env.PROD 
-  ? '/api' 
-  : (import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api').replace(/\/$/, '');
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api';
 
 export default function AdminUsers() {
   const { user, token, loading } = useAuth();
