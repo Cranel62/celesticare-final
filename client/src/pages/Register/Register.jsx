@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Register.module.css';
 
 export default function Register() {
-  const navigate = useNavigate();
   const { register } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -15,6 +14,7 @@ export default function Register() {
     admin_secret: ''
   });
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const isAdminDomain = formData.email.trim().toLowerCase().endsWith('@celesticare.admin.com');
@@ -27,6 +27,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+    setSuccessMessage('');
 
     if (formData.password !== formData.confirm_password) {
       setErrorMessage('Passwords do not match.');
@@ -37,7 +38,7 @@ export default function Register() {
     try {
       const result = await register(formData);
       if (result.success) {
-        navigate('/get-to-know');
+        setSuccessMessage(result.message || 'Check your inbox for a verification link.');
       } else {
         setErrorMessage(result.error || 'Registration failed.');
       }
@@ -57,6 +58,11 @@ export default function Register() {
         {errorMessage && (
           <div className={styles.alertDanger}>
             {errorMessage}
+          </div>
+        )}
+        {successMessage && (
+          <div className={styles.alertSuccess} role="status">
+            {successMessage}
           </div>
         )}
 

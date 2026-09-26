@@ -1,11 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { API_BASE } from '../api/axios';
 
 const AuthContext = createContext();
 
-const API_BASE = import.meta.env.PROD 
-  ? '/api' 
-  : 'https://celesticare-api.onrender.com/api';
-  
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || null);
@@ -106,10 +103,7 @@ export const AuthProvider = ({ children }) => {
         };
       }
 
-      localStorage.setItem('token', data.token);
-      setToken(data.token);
-      setUser(data.user);
-      return { success: true, user: data.user };
+      return { success: true, message: data.message };
     } catch (err) {
       console.error('[AuthContext] Registration connection error:', err);
       return { 

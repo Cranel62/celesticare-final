@@ -16,24 +16,21 @@ import { saveUndertone, getRecentTarot } from './controllers/userController.js';
 import { verifyToken } from './middlewares/authMiddleware.js';
 
 dotenv.config();
-connectDB();
 
 const app = express();
 
 app.use(helmet());
 
-// Dynamic CORS configuration allowing localhost and any *.vercel.app domain
 const envAllowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim().replace(/\/$/, ''))
-  : ['http://localhost:5173', 'http://127.0.0.1:5173', 'https://celesticare-final.vercel.app'];
+  : [];
 
 const dynamicCorsOptions = {
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
     const isExplicitlyAllowed = envAllowedOrigins.includes(origin);
-    const isVercelDomain = origin.endsWith('.vercel.app');
 
-    if (isExplicitlyAllowed || isVercelDomain) {
+    if (isExplicitlyAllowed) {
       callback(null, true);
     } else {
       callback(new Error(`CORS policy rejection: Origin ${origin} not allowed.`));
@@ -45,6 +42,7 @@ const dynamicCorsOptions = {
 };
 
 app.use(cors(dynamicCorsOptions));
+app.set('trust proxy', 1);
 
 // Unauthenticated health-check route (bypasses rate limiters for external pinging)
 app.get('/api/health', (req, res) => {
@@ -82,6 +80,16 @@ app.get('/api/tarot/recent', verifyToken, getRecentTarot);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`[Server]: CelestiCare API operational on port ${PORT}`);
+
+const startServer = async () => {
+  if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET must be configured.');
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`[Server]: CelestiCare API operational on port ${PORT}`);
+  });
+};
+
+startServer().catch((error) => {
+  console.error(`[Server Startup Error]: ${error.message}`);
+  process.exit(1);
 });

@@ -31,6 +31,9 @@ const userSchema = new mongoose.Schema(
       default: 'user'
     },
     is_admin: { type: Boolean, default: false },
+    isVerified: { type: Boolean, default: true },
+    verificationTokenHash: { type: String, select: false },
+    verificationTokenExpiresAt: { type: Date, select: false },
     deleted_at: { type: Date, default: null },
     show_reset_notification: { type: Boolean, default: false },
     zodiac_sign: { type: String, default: null },

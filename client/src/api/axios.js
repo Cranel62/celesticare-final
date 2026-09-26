@@ -1,9 +1,12 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://celesticare-api.onrender.com/api';
+const configuredApiBase = import.meta.env.VITE_API_BASE_URL;
+if (!configuredApiBase) throw new Error('VITE_API_BASE_URL must be configured.');
+
+export const API_BASE = configuredApiBase.replace(/\/+$/, '');
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: API_BASE,
   headers: {
     'Content-Type': 'application/json'
   }
